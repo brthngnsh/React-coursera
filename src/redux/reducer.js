@@ -13,3 +13,5 @@ export const initialState = {
 export const Reducer = (state = initialState, action) => {
     return state;
 };
+
+// No longer Required and will be deletedd in next update
