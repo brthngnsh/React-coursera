@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Control, LocalForm, Errors } from 'react-redux-form' ;
+import { Loading } from './LoadingComponent';
 
 const required = (val) => val&&val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -27,11 +28,31 @@ class CommentForm extends Component {
           });
       }
 
-    submitHandle=(event) => {
+    submitHandle=(values) => {
         this.toggleModal();
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment );
     }
 
     render() {
+        if (this.props.isLoading) {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <Loading />
+                    </div>
+                </div>
+            );
+        }
+        else if (this.props.errMess) {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <h4>{this.props.errMess}</h4>
+                    </div>
+                </div>
+            );
+        }
+        else if (this.props.dish != null) {
         return(
             <React.Fragment>
                 <Button className='bg-white text-dark' onClick={this.toggleModal}><span className='fa fa-pencil fa-lg'></span> Submit Comment</Button>
@@ -105,7 +126,7 @@ class CommentForm extends Component {
                     </ModalBody>
                 </Modal>
             </React.Fragment>
-        );
+        );}
     }
 
 }
@@ -122,7 +143,7 @@ class CommentForm extends Component {
         );
     }
 
-    function RenderComments({comments}) {
+    function RenderComments({comments, addComment, dishId}) {
         var commentList = comments.map(comment => {
             return (
                 <li key={comment.id} >
@@ -139,7 +160,7 @@ class CommentForm extends Component {
                 <h4>Comments</h4>
                 <ul className="list-unstyled">
                     {commentList}
-                    <CommentForm />
+                    <CommentForm dishId={dishId} addComment={addComment} />
                 </ul>
             </div>
         );
@@ -165,7 +186,9 @@ class CommentForm extends Component {
                         <RenderDish dish={props.dish} />
                     </div>
                     <div className="col-12 col-md-5 m-1">
-                        <RenderComments comments={props.comments} />
+                    <RenderComments comments={props.comments}
+                    addComment={props.addComment}
+                    dishId={props.dish.id} />
                     </div>
                 </div>
                 </div>
